@@ -6,7 +6,17 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import { useAuthStore } from "@/store/Auth";
+import { account } from "@/models/client/config"; // Added this import
 import Link from "next/link";
+
+// Added OAuth Handler function
+const handleOAuthLogin = (provider: "google" | "github") => {
+    account.createOAuth2Session(
+        provider as any,
+        `${window.location.origin}/`, // Redirect here on success
+        `${window.location.origin}/register` // Redirect here on failure
+    );
+};
 
 const BottomGradient = () => {
     return (
@@ -70,15 +80,15 @@ export default function Register() {
     return (
         <div className="mx-auto w-full max-w-md rounded-none border border-solid border-white/30 bg-white p-4 shadow-input dark:bg-black md:rounded-2xl md:p-8">
             <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
-                Welcome to Riverflow
+                Welcome to StackQuery
             </h2>
             <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300">
-                Signup with riverflow if you don&apos;t have an account.
+                Signup with StackQuery if you don&apos;t have an account.
                 <br /> If you already have an account,{" "}
                 <Link href="/login" className="text-orange-500 hover:underline">
                     login
                 </Link>{" "}
-                to riverflow
+                to StackQuery
             </p>
 
             {error && (
@@ -146,6 +156,7 @@ export default function Register() {
                     <button
                         className="group/btn relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black shadow-input dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
                         type="button"
+                        onClick={() => handleOAuthLogin("google")} // Added onClick
                         disabled={isLoading}
                     >
                         <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
@@ -157,6 +168,7 @@ export default function Register() {
                     <button
                         className="group/btn relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black shadow-input dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
                         type="button"
+                        onClick={() => handleOAuthLogin("github")} // Added onClick
                         disabled={isLoading}
                     >
                         <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
