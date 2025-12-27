@@ -10,15 +10,18 @@ const Page = async ({
     params,
     searchParams,
 }: {
-    params: { userId: string; userSlug: string };
-    searchParams: { page?: string };
+    params: Promise<{ userId: string; userSlug: string }>;
+    searchParams: Promise<{ page?: string }>;
 }) => {
-    searchParams.page ||= "1";
+    // Await both params and searchParams
+    const { userId } = await params;
+    const resolvedSearchParams = await searchParams;
+    const page = resolvedSearchParams.page || "1";
 
     const queries = [
-        Query.equal("authorId", params.userId),
+        Query.equal("authorId", userId),
         Query.orderDesc("$createdAt"),
-        Query.offset((+searchParams.page - 1) * 25),
+        Query.offset((+page - 1) * 25),
         Query.limit(25),
     ];
 
@@ -30,12 +33,12 @@ const Page = async ({
                 users.get<UserPrefs>(ques.authorId),
                 databases.listDocuments(db, answerCollection, [
                     Query.equal("questionId", ques.$id),
-                    Query.limit(1), // for optimization
+                    Query.limit(1),
                 ]),
                 databases.listDocuments(db, voteCollection, [
                     Query.equal("type", "question"),
                     Query.equal("typeId", ques.$id),
-                    Query.limit(1), // for optimization
+                    Query.limit(1),
                 ]),
             ]);
 
